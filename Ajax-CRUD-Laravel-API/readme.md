@@ -351,6 +351,63 @@ This Laravel project implements AJAX-based CRUD operations for managing tasks. T
     }
 ```
 
+   **Another HELPER created too for standarize json response.
+   ```php
+<?php
+
+// 🌟 Custom Helpers for Standardized JSON Responses
+
+// ✅ Custom Success Response
+if (!function_exists('successResponse')) {
+    /**
+     * Generates a standardized success response.
+     *
+     * @param string $message The success message to return.
+     * @param array $data Optional additional data to include in the response.
+     * @return \Illuminate\Http\JsonResponse The JSON response with success status.
+     */
+    function successResponse($message, $data = [])
+    {
+        return response()->json([
+            'success' => 1,
+            'message' => $message,
+            'data' => $data,
+        ], 200);
+    }
+}
+
+// ❌ Custom Error Response for Production and Development
+if (!function_exists('errorResponse')) {
+    /**
+     * Generates a standardized error response.
+     *
+     * @param \Exception $e The exception that occurred.
+     * @param string $message Optional custom message for the error.
+     * @param int $code The HTTP status code for the response (default: 422).
+     * @return \Illuminate\Http\JsonResponse The JSON response with error status.
+     */
+    function errorResponse($e, $message = '', $code = 422)
+    {
+        // For production, return a generic error message.
+        // For local or development environments, provide detailed error information.
+        if (app()->environment('production')) {
+            return response()->json([
+                'status' => 0,
+                'message' => !empty($message) ? $message : 'Something went wrong! Failed to complete this action.',
+                'data' => [],
+            ], $code);
+        } else {
+            return response()->json([
+                'status' => 0,
+                'message' => $e->getMessage() . '. Line: ' . $e->getLine() . '. File: ' . $e->getFile(),
+                'data' => [],
+            ], $code);
+        }
+    }
+}
+
+   ```
+
 6. **Using Action Filter Logic (Optional)**  
    To simplify controller logic, you may use Actions such as `FilterTasks`:
    ```php
@@ -982,6 +1039,11 @@ This JavaScript file handles AJAX requests for creating, updating, and deleting 
 ```javascript 
     <script src="{{ asset('assets/js/ajax-jquery-crud-update.js') }}"></script>
 ```
+
+### Key Changes Made:
+- **Added Context**: Clear descriptions of what each function does.
+- **Improved Comments**: More detailed comments explaining parameters and return values.
+- **Standardized Structure**: Used consistent formatting for better readability.
 
 ## License
 
